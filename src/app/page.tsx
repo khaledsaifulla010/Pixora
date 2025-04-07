@@ -1,7 +1,7 @@
 export default function Home() {
   return (
     <div>
-      <h1>Pixora</h1>
+      <h1 className="text-5xl mt-36 text-center font-lora font-bold">Pixora</h1>
     </div>
   );
 }
