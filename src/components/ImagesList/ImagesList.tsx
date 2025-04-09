@@ -1,8 +1,35 @@
 "use client";
 import React, { useEffect, useState } from "react";
+import Box from "@mui/material/Box";
+import Modal from "@mui/material/Modal";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: "auto",
+  maxWidth: 700,
+  bgcolor: "black",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 2,
+};
 
 const ImagesList = () => {
   const [images, setImages] = useState<any[]>([]);
+  const [open, setOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+  const handleOpen = (url: string) => {
+    setSelectedImage(url);
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedImage(null);
+  };
 
   useEffect(() => {
     const fetchImages = async () => {
@@ -32,10 +59,9 @@ const ImagesList = () => {
                     key={idx}
                     src={url}
                     alt={`${item.title} ${idx + 1}`}
-                    width={350}
-                    height={300}
-                    className="border p-2 rounded-xl "
+                    className="border p-2 rounded-xl cursor-pointer"
                     style={{ width: "350px", height: "350px" }}
+                    onClick={() => handleOpen(url)}
                   />
                 ))}
               </div>
@@ -47,6 +73,29 @@ const ImagesList = () => {
           Oops! Your Gallery is Empty
         </p>
       )}
+
+      {/* Image Preview Modal */}
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="image-modal"
+        aria-describedby="preview of clicked image"
+      >
+        <Box sx={style}>
+          {selectedImage && (
+            <img
+              src={selectedImage}
+              alt="Preview"
+              className="rounded-xl"
+              style={{
+                width: "800px",
+                maxHeight: "80vh",
+                objectFit: "contain",
+              }}
+            />
+          )}
+        </Box>
+      </Modal>
     </div>
   );
 };

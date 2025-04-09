@@ -11,8 +11,7 @@ export default function Home() {
       <Divider sx={{ borderColor: "gray", marginTop: 2 }} />
 
       <div className="mt-12">
-        <ImagesList/>
-
+        <ImagesList />
       </div>
     </div>
   );
