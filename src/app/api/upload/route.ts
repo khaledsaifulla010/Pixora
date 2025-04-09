@@ -3,6 +3,7 @@ import cloudinary from "../../lib/cloudinary";
 import Image from "../../models/Image";
 import dbConnect from "@/app/lib/connectDB";
 
+// POST A IMAGE IN DATABASE //
 export async function POST(req: NextRequest) {
   await dbConnect();
 
@@ -47,4 +48,26 @@ export async function POST(req: NextRequest) {
     success: true,
     data: savedImage,
   });
+}
+
+// GET ALL IMAGES FROM DATABASE //
+export async function GET(req: NextRequest) {
+  await dbConnect();
+
+  try {
+    // Fetch all images from the database
+    const images = await Image.find();
+
+    return NextResponse.json({
+      success: true,
+      data: images,
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: "Error fetching images",
+      },
+      { status: 500 }
+    );
+  }
 }
