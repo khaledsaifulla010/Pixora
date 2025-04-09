@@ -71,3 +71,46 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
+// DELETE A SPECIFIC IMAGE
+export async function DELETE(req: NextRequest) {
+  await dbConnect();
+
+  try {
+    const url = new URL(req.url);
+    const id = url.searchParams.get("id");
+
+    if (!id) {
+      return NextResponse.json(
+        {
+          error: "Image ID is required",
+        },
+        { status: 400 }
+      );
+    }
+
+    // Delete the image from the database by its ID
+    const deletedImage = await Image.findByIdAndDelete(id);
+
+    if (!deletedImage) {
+      return NextResponse.json(
+        {
+          error: "Image not found",
+        },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Image deleted successfully",
+    });
+  } catch (error) {
+    return NextResponse.json(
+      {
+        error: "Error deleting image",
+      },
+      { status: 500 }
+    );
+  }
+}
