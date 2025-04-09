@@ -1,13 +1,13 @@
-import UploadImage from "@/components/UploadImage/UploadImage";
+import BasicModal from "@/components/BasicModal/BasicModal";
+import Divider from "@mui/material/Divider";
 
 export default function Home() {
   return (
-    <div>
-      <h1 className="text-5xl mt-36 text-center font-lora font-bold">Pixora</h1>
-
-      <div className="mt-24 mb-36 max-w-[500px] mx-auto">
-        <UploadImage />
+    <div className="min-h-screen">
+      <div className="ml-[1400px] mt-8">
+        <BasicModal />
       </div>
+      <Divider sx={{ borderColor: "gray", marginTop: 2 }} />
     </div>
   );
 }
