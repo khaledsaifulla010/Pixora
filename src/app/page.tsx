@@ -1,4 +1,5 @@
 import BasicModal from "@/components/BasicModal/BasicModal";
+import ImagesList from "@/components/ImagesList/ImagesList";
 import Divider from "@mui/material/Divider";
 
 export default function Home() {
@@ -8,6 +9,11 @@ export default function Home() {
         <BasicModal />
       </div>
       <Divider sx={{ borderColor: "gray", marginTop: 2 }} />
+
+      <div className="mt-12">
+        <ImagesList/>
+
+      </div>
     </div>
   );
 }
