@@ -5,7 +5,6 @@ import { useState } from "react";
 
 type FormValues = {
   title: string;
-  createdAt: string;
   images: FileList;
 };
 
@@ -16,8 +15,6 @@ const UploadImage = () => {
   const onSubmit = async (data: FormValues) => {
     const formData = new FormData();
     formData.append("title", data.title);
-    formData.append("createdAt", data.createdAt);
-
     for (let i = 0; i < data.images.length; i++) {
       formData.append("images", data.images[i]);
     }
@@ -43,12 +40,6 @@ const UploadImage = () => {
         />
 
         <input
-          type="datetime-local"
-          {...register("createdAt", { required: true })}
-          className="border px-3 py-2 w-full"
-        />
-
-        <input
           type="file"
           {...register("images", { required: true })}
           multiple
@@ -63,16 +54,16 @@ const UploadImage = () => {
           Upload
         </button>
 
-        {response && (
+        {response?.data && (
           <div className="mt-4">
-            <p className="font-bold">Uploaded URLs:</p>
-            <ul>
-              {response.urls.map((url: string, i: number) => (
-                <li key={i}>
-                  <img src={url} alt={`Uploaded ${i}`} className="w-48 mt-2" />
-                </li>
+            <p className="font-bold">Uploaded:</p>
+            <p>Title: {response.data.title}</p>
+            <p>Date: {new Date(response.data.createdAt).toLocaleString()}</p>
+            <div className="grid grid-cols-2 gap-4 mt-2">
+              {response.data.imageUrls.map((url: string, i: number) => (
+                <img key={i} src={url} className="w-full rounded" />
               ))}
-            </ul>
+            </div>
           </div>
         )}
       </form>

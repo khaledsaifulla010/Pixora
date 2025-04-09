@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import cloudinary from "../../lib/cloudinary";
-
+import Image from "../../models/Image";
+import dbConnect from "@/app/lib/connectDB";
 
 export async function POST(req: NextRequest) {
-
+  await dbConnect();
 
   const formData = await req.formData();
   const title = formData.get("title");
-  const createdAt = formData.get("createdAt");
   const files = formData.getAll("images") as File[];
+
+  if (!title || files.length === 0) {
+    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  }
 
   const uploadedUrls: string[] = [];
 
@@ -34,10 +38,13 @@ export async function POST(req: NextRequest) {
     uploadedUrls.push(uploadResult.secure_url);
   }
 
+  const savedImage = await Image.create({
+    title,
+    imageUrls: uploadedUrls,
+  });
+
   return NextResponse.json({
     success: true,
-    title,
-    createdAt,
-    urls: uploadedUrls,
+    data: savedImage,
   });
 }
