@@ -2,7 +2,9 @@
 
 import { useForm } from "react-hook-form";
 import { useState } from "react";
-
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 type FormValues = {
   title: string;
   images: FileList;
@@ -10,63 +12,88 @@ type FormValues = {
 
 const UploadImage = () => {
   const { register, handleSubmit, reset } = useForm<FormValues>();
-  const [response, setResponse] = useState<any>(null);
+  const [uploadedImages, setUploadedImages] = useState<string[]>([]);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"success" | "error">(
+    "success"
+  );
+
+  const handleCloseSnackbar = () => setSnackbarOpen(false);
 
   const onSubmit = async (data: FormValues) => {
     const formData = new FormData();
     formData.append("title", data.title);
-    for (let i = 0; i < data.images.length; i++) {
-      formData.append("images", data.images[i]);
-    }
 
-    const res = await fetch("/api/upload", {
-      method: "POST",
-      body: formData,
+    Array.from(data.images).forEach((file) => {
+      formData.append("images", file);
     });
 
-    const result = await res.json();
-    setResponse(result);
-    reset();
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await res.json();
+
+      if (res.ok) {
+        setSnackbarSeverity("success");
+        setSnackbarMessage("Images uploaded successfully!");
+        setUploadedImages(result.data.imageUrls);
+        reset();
+      } else {
+        setSnackbarSeverity("error");
+        setSnackbarMessage(result?.error || "Upload failed.");
+      }
+    } catch (error) {
+      setSnackbarSeverity("error");
+      setSnackbarMessage("Something went wrong!");
+    } finally {
+      setSnackbarOpen(true);
+    }
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+    <div className="max-w-xl h-[200px] mx-auto space-y-8 p-4 border rounded-xl">
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
         <input
           type="text"
           {...register("title", { required: true })}
-          placeholder="Image title"
-          className="border px-3 py-2 w-full"
+          placeholder="Enter Image Title"
+          className=" px-3 py-2 w-full rounded-xl text-white placeholder-white bg-gray-800"
         />
 
         <input
           type="file"
           {...register("images", { required: true })}
-          multiple
           accept="image/*"
-          className="border px-3 py-2 w-full"
+          multiple
+          className=" px-3 py-2 w-full cursor-pointer rounded-xl text-white placeholder-white bg-gray-800"
         />
 
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded"
+          className="bg-blue-600 hover:bg-blue-700 font-bold text-white px-4 py-2 rounded cursor-pointer w-full"
         >
-          Upload
+          Upload <CloudUploadIcon />
         </button>
-
-        {response?.data && (
-          <div className="mt-4">
-            <p className="font-bold">Uploaded:</p>
-            <p>Title: {response.data.title}</p>
-            <p>Date: {new Date(response.data.createdAt).toLocaleString()}</p>
-            <div className="grid grid-cols-2 gap-4 mt-2">
-              {response.data.imageUrls.map((url: string, i: number) => (
-                <img key={i} src={url} className="w-full rounded" />
-              ))}
-            </div>
-          </div>
-        )}
       </form>
+      {/* Snackbar */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
